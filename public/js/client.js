@@ -3,16 +3,19 @@ var     score = 0
     ,   scoreText
     ,   platforms
     ,   stars
+    ,   spikes
     ,   fx_jump
     ,   fx_step
     ,   fx_star
+    ,   fx_spike
     ,   music
     ,   volume = 0.8
     ,   step_isPlaying = false
     ,   filter = []
     ,   FILTER_VIGNETTE = 0
     ,   FILTER_FILMGRAIN = 1
-    ,   FILTER_SNOISE = 1;
+    ,   FILTER_SNOISE = 1
+    ,   timer;
 
 function preload() {
     loadAudio();
@@ -29,6 +32,7 @@ function create() {
     createPlatforms();
     createGround();
     createLedges();
+    createSpikes();
     createPlayer();
     createStars();
     createAudio();
@@ -43,7 +47,9 @@ function update() {
     cursors = game.input.keyboard.createCursorKeys();
     game.physics.arcade.collide(stars, platforms);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, spikes, killPlayer, null, this);
     updatePlayer();
+
 
     f.update();
 }
@@ -69,6 +75,7 @@ function loadImages(){
     game.load.image('sky', 'public/assets/sky.png');
     game.load.image('ground', 'public/assets/platform.png');
     game.load.image('star', 'public/assets/star.png');
+    game.load.image('spike', 'public/assets/spike.png');
 }
 
 function createFilters(){
@@ -112,6 +119,22 @@ function createGround(){
     ground.body.immovable = true;
 }
 
+function createSpikes(){
+    spikes =  game.add.group();
+    spikes.enableBody = true;
+
+    spikes.create(128,game.world.height - 64-32,'spike');
+    spikes.create(256,game.world.height - 64-32,'spike');
+    spikes.create(480,game.world.height - 64-32,'spike');
+
+    spikes.create(464,400 -32,'spike');
+    spikes.create(600,400 -32,'spike');
+    spikes.create(700,400 -32,'spike');
+
+    spikes.create(0,250-32,'spike');
+    spikes.create(128,250-32,'spike');
+}
+
 function createLedges(){
     //  Now let's create two ledges
     var ledge = platforms.create(400, 400, 'ground');
@@ -147,6 +170,7 @@ function createAudio(){
 
     music = game.add.audio('bg_music');
     music.volume = volume;
+    music.loop = true;
     music.play();
 }
 
@@ -165,7 +189,7 @@ function createStars(){
         star.body.gravity.y = 6;
 
         //  This just gives each star a slightly random bounce value
-        star.body.bounce.y = 0.7 + Math.random() * 0.2;
+        star.body.bounce.y = 0.4 + Math.random() * 0.2;
     }
 }
 
@@ -228,4 +252,9 @@ function collectStar (player, star) {
     score += 10;
     scoreText.text = 'Score: ' + score;
 
+}
+
+function killPlayer(player, spike){
+    player.kill();
+    scoreText.text = 'Game Over!';
 }
