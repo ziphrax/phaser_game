@@ -7,28 +7,56 @@ var fx_jump,fx_step,fx_star,music,volume = 0.8;
 var step_isPlaying = false;
 
 function preload() {
-    game.load.image('sky', 'public/assets/sky.png');
-    game.load.image('ground', 'public/assets/platform.png');
-    game.load.image('star', 'public/assets/star.png');
-    game.load.spritesheet('dude', 'public/assets/dude1.png', 32, 48);
+    loadAudio();
+    loadImages();
+    loadSpritesheets();
+}
+
+function loadAudio(){
     game.load.audio('bg_music','/public/assets/audio/Electrix_NES.mp3');
     game.load.audio('jump','/public/assets/audio/platformer_jumping/jump_05.wav');
     game.load.audio('step','/public/assets/audio/steps/stepstone_1.wav');
     game.load.audio('star','/public/assets/audio/completetask_0.mp3');
 }
 
+function loadSpritesheets(){
+    game.load.spritesheet('dude', 'public/assets/dude1.png', 32, 48);
+}
+
+function loadImages(){
+    game.load.image('sky', 'public/assets/sky.png');
+    game.load.image('ground', 'public/assets/platform.png');
+    game.load.image('star', 'public/assets/star.png');
+}
+
 function create() {
-  game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
+    createBackground();
+    createPlatforms();
+    createGround();
+    createLedges();
+    createPlayer();
+    createStars();
+    createAudio();
 
+    scoreText = game.add.text(310, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+}
+
+function createPlatforms(){
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
 
     //  We will enable physics for any object that is created in this group
     platforms.enableBody = true;
+}
 
+function createBackground(){
+    //  A simple background for our game
+    game.add.sprite(0, 0, 'sky');
+}
+
+function createGround(){
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
 
@@ -37,7 +65,9 @@ function create() {
 
     //  This stops it from falling away when you jump on it
     ground.body.immovable = true;
+}
 
+function createLedges(){
     //  Now let's create two ledges
     var ledge = platforms.create(400, 400, 'ground');
 
@@ -46,7 +76,9 @@ function create() {
     ledge = platforms.create(-150, 250, 'ground');
 
     ledge.body.immovable = true;
+}
 
+function createPlayer(){
     // The player and its settings
    player = game.add.sprite(32, game.world.height - 150, 'dude');
 
@@ -60,34 +92,36 @@ function create() {
 
    //  Our idle animation
    player.animations.add('idle', [0, 1, 2, 3,4,5,6,7], 6, true);
+}
 
-   stars = game.add.group();
+function createAudio(){
+    fx_jump = game.add.audio('jump');
+    fx_step = game.add.audio('step');
+    fx_step.loop = true;
+    fx_star = game.add.audio('star');
 
-   stars.enableBody = true;
+    music = game.add.audio('bg_music');
+    music.volume = volume;
+    music.play();
+}
 
-   //  Here we'll create 12 of them evenly spaced apart
-   for (var i = 0; i < 12; i++)
-   {
-       //  Create a star inside of the 'stars' group
-       var star = stars.create(i * 70, 0, 'star');
+function createStars(){
+    stars = game.add.group();
 
-       //  Let gravity do its thing
-       star.body.gravity.y = 6;
+    stars.enableBody = true;
 
-       //  This just gives each star a slightly random bounce value
-       star.body.bounce.y = 0.7 + Math.random() * 0.2;
-   }
+    //  Here we'll create 12 of them evenly spaced apart
+    for (var i = 0; i < 12; i++)
+    {
+        //  Create a star inside of the 'stars' group
+        var star = stars.create(i * 70, 0, 'star');
 
-   scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        //  Let gravity do its thing
+        star.body.gravity.y = 6;
 
-   fx_jump = game.add.audio('jump');
-   fx_step = game.add.audio('step');
-   fx_step.loop = true;
-   fx_star = game.add.audio('star');
-
-   music = game.add.audio('bg_music');
-   music.volume = volume;
-   music.play();
+        //  This just gives each star a slightly random bounce value
+        star.body.bounce.y = 0.7 + Math.random() * 0.2;
+    }
 }
 
 function update() {
@@ -95,51 +129,54 @@ function update() {
   cursors = game.input.keyboard.createCursorKeys();
   game.physics.arcade.collide(stars, platforms);
   game.physics.arcade.overlap(player, stars, collectStar, null, this);
-  //  Reset the players velocity (movement)
-   player.body.velocity.x = 0;
+  updatePlayer();
+}
 
-   if (cursors.left.isDown)
-   {
-       //  Move to the left
-       player.body.velocity.x = -150;
-       if(!step_isPlaying){
-         fx_step.play();
-        step_isPlaying = true;
+function updatePlayer(){
+    //  Reset the players velocity (movement)
+     player.body.velocity.x = 0;
+
+     if (cursors.left.isDown)
+     {
+         //  Move to the left
+         player.body.velocity.x = -150;
+         if(!step_isPlaying){
+           fx_step.play();
+          step_isPlaying = true;
+        }
+         //player.animations.play('left');
+     }
+     else if (cursors.right.isDown)
+     {
+         //  Move to the right
+         player.body.velocity.x = 150;
+         if(!step_isPlaying){
+           fx_step.play();
+          step_isPlaying = true;
+         }
+
+        // player.animations.play('right');
+     }
+     else
+     {
+         //  Stand still
+        player.animations.play('idle');
+        step_isPlaying = false;
+        fx_step.stop();
+
+     }
+
+     //  Allow the player to jump if they are touching the ground.
+     if (cursors.up.isDown && player.body.touching.down)
+     {
+        fx_jump.play();
+        step_isPlaying = false;
+         player.body.velocity.y = -350;
+     }
+
+      if(score == 120){
+        scoreText.text = 'Level Complete!';
       }
-       //player.animations.play('left');
-   }
-   else if (cursors.right.isDown)
-   {
-       //  Move to the right
-       player.body.velocity.x = 150;
-       if(!step_isPlaying){
-         fx_step.play();
-        step_isPlaying = true;
-       }
-
-      // player.animations.play('right');
-   }
-   else
-   {
-       //  Stand still
-      player.animations.play('idle');
-      step_isPlaying = false;
-      fx_step.stop();
-
-   }
-
-   //  Allow the player to jump if they are touching the ground.
-   if (cursors.up.isDown && player.body.touching.down)
-   {
-      fx_jump.play();
-      step_isPlaying = false;
-       player.body.velocity.y = -350;
-   }
-
-    if(score == 120){
-      scoreText.text = 'Game Complete!';
-    }
-
 }
 
 function collectStar (player, star) {
