@@ -1,15 +1,41 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-var platforms,stars;
-var score = 0;
-var scoreText;
-
-var fx_jump,fx_step,fx_star,music,volume = 0.8;
-var step_isPlaying = false;
+var     game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var     score = 0
+    ,   scoreText
+    ,   platforms
+    ,   stars
+    ,   fx_jump
+    ,   fx_step
+    ,   fx_star
+    ,   music
+    ,   volume = 0.8
+    ,   step_isPlaying = false;
 
 function preload() {
     loadAudio();
     loadImages();
     loadSpritesheets();
+}
+
+function create() {
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    createBackground();
+    createPlatforms();
+    createGround();
+    createLedges();
+    createPlayer();
+    createStars();
+    createAudio();
+
+    scoreText = game.add.text(310, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+}
+
+function update() {
+    game.physics.arcade.collide(player, platforms);
+    cursors = game.input.keyboard.createCursorKeys();
+    game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    updatePlayer();
 }
 
 function loadAudio(){
@@ -27,20 +53,6 @@ function loadImages(){
     game.load.image('sky', 'public/assets/sky.png');
     game.load.image('ground', 'public/assets/platform.png');
     game.load.image('star', 'public/assets/star.png');
-}
-
-function create() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    createBackground();
-    createPlatforms();
-    createGround();
-    createLedges();
-    createPlayer();
-    createStars();
-    createAudio();
-
-    scoreText = game.add.text(310, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 }
 
 function createPlatforms(){
@@ -122,14 +134,6 @@ function createStars(){
         //  This just gives each star a slightly random bounce value
         star.body.bounce.y = 0.7 + Math.random() * 0.2;
     }
-}
-
-function update() {
-  game.physics.arcade.collide(player, platforms);
-  cursors = game.input.keyboard.createCursorKeys();
-  game.physics.arcade.collide(stars, platforms);
-  game.physics.arcade.overlap(player, stars, collectStar, null, this);
-  updatePlayer();
 }
 
 function updatePlayer(){
