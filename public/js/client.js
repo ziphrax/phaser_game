@@ -8,18 +8,24 @@ var     score = 0
     ,   fx_star
     ,   music
     ,   volume = 0.8
-    ,   step_isPlaying = false;
+    ,   step_isPlaying = false
+    ,   filter = []
+    ,   FILTER_VIGNETTE = 0
+    ,   FILTER_FILMGRAIN = 1
+    ,   FILTER_SNOISE = 1;
 
 function preload() {
     loadAudio();
     loadImages();
     loadSpritesheets();
+    loadFilters();
 }
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     createBackground();
+    createFilters();
     createPlatforms();
     createGround();
     createLedges();
@@ -31,11 +37,21 @@ function create() {
 }
 
 function update() {
+    var f = filter[FILTER_FILMGRAIN];
+
     game.physics.arcade.collide(player, platforms);
     cursors = game.input.keyboard.createCursorKeys();
     game.physics.arcade.collide(stars, platforms);
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
     updatePlayer();
+
+    f.update();
+}
+
+function loadFilters(){
+    game.load.script('filter-vignette', '/public/assets/filters/Vignette.js');
+    game.load.script('filter-snoise', '/public/assets/filters/SNoise.js');
+    game.load.script('filter-filmgrain', '/public/assets/filters/FilmGrain.js');
 }
 
 function loadAudio(){
@@ -53,6 +69,23 @@ function loadImages(){
     game.load.image('sky', 'public/assets/sky.png');
     game.load.image('ground', 'public/assets/platform.png');
     game.load.image('star', 'public/assets/star.png');
+}
+
+function createFilters(){
+    filter[FILTER_VIGNETTE] = game.add.filter('Vignette');
+    filter[FILTER_VIGNETTE].size = 0.3;
+    filter[FILTER_VIGNETTE].amount = 0.5;
+    filter[FILTER_VIGNETTE].alpha = 1.0;
+
+    filter[FILTER_SNOISE] = game.add.filter('SNoise');
+
+    filter[FILTER_FILMGRAIN] = game.add.filter('FilmGrain');
+    filter[FILTER_FILMGRAIN].color = 0.6;
+    filter[FILTER_FILMGRAIN].amount = 0.04;
+    filter[FILTER_FILMGRAIN].luminance = 0.8;
+
+
+    game.stage.filters = [filter[FILTER_FILMGRAIN], filter[FILTER_VIGNETTE],filter[FILTER_SNOISE]];
 }
 
 function createPlatforms(){
