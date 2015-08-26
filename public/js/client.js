@@ -1,4 +1,5 @@
 var     game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var     socket = io();
 var     score = 0
     ,   scoreText
     ,   platforms
@@ -55,27 +56,27 @@ function update() {
 }
 
 function loadFilters(){
-    game.load.script('filter-vignette', '/public/assets/filters/Vignette.js');
-    game.load.script('filter-snoise', '/public/assets/filters/SNoise.js');
-    game.load.script('filter-filmgrain', '/public/assets/filters/FilmGrain.js');
+    game.load.script('filter-vignette', '/assets/filters/Vignette.js');
+    game.load.script('filter-snoise', '/assets/filters/SNoise.js');
+    game.load.script('filter-filmgrain', '/assets/filters/FilmGrain.js');
 }
 
 function loadAudio(){
-    game.load.audio('bg_music','/public/assets/audio/Electrix_NES.mp3');
-    game.load.audio('jump','/public/assets/audio/platformer_jumping/jump_05.wav');
-    game.load.audio('step','/public/assets/audio/steps/stepstone_1.wav');
-    game.load.audio('star','/public/assets/audio/completetask_0.mp3');
+    game.load.audio('bg_music','/assets/audio/Electrix_NES.mp3');
+    game.load.audio('jump','/assets/audio/platformer_jumping/jump_05.wav');
+    game.load.audio('step','/assets/audio/steps/stepstone_1.wav');
+    game.load.audio('star','/assets/audio/completetask_0.mp3');
 }
 
 function loadSpritesheets(){
-    game.load.spritesheet('dude', 'public/assets/dude1.png', 32, 48);
+    game.load.spritesheet('dude', '/assets/dude1.png', 32, 48);
 }
 
 function loadImages(){
-    game.load.image('sky', 'public/assets/sky.png');
-    game.load.image('ground', 'public/assets/platform.png');
-    game.load.image('star', 'public/assets/star.png');
-    game.load.image('spike', 'public/assets/spike.png');
+    game.load.image('sky', '/assets/sky.png');
+    game.load.image('ground', '/assets/platform.png');
+    game.load.image('star', '/assets/star.png');
+    game.load.image('spike', '/assets/spike.png');
 }
 
 function createFilters(){
