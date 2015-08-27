@@ -11,12 +11,15 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
+  gs = new gameServer(socket);
+
   console.log('a user connected: ' + socket.id);
   socket.on('update player',function(position){
       console.log(position);
   });
 
-  socket.on('diconnect',gameServer.onDisconnect);
+  socket.on('diconnect',gs.onDisconnect);
+  socket.on('Get Lobby List',gs.onGetLobbyList);
 
 });
 

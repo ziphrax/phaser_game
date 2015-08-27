@@ -12,7 +12,7 @@ preload.prototype = {
 		  loadImages();
 	},
   	create: function(){
-		game.state.start("InGame");
+		game.state.start("Lobby");
 	}
 }
 

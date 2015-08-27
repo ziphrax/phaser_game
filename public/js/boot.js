@@ -1,3 +1,6 @@
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'Game');
+var socket = io();
+
 var boot = function(game){
 	console.log("%cStarting my awesome game", "color:white; background:red");
 };

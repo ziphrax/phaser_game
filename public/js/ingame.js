@@ -19,12 +19,6 @@ var     score = 0
     ,   socket;
 
 ingame.prototype = {
-    preload:function() {
-        loadAudio();
-        loadImages();
-        loadSpritesheets();
-        loadFilters();
-    },
     create: function() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
