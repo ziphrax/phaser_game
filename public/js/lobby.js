@@ -4,7 +4,6 @@ lobby.prototype = {
   	create: function(){
         socket.emit('Get Lobby List');
         rooms = game.add.group();
-		//game.state.start("InGame");
 	}
 }
 
@@ -16,9 +15,9 @@ socket.on('Update Lobby List',function(list){
         rooms.add(text);
         rooms.add(button);
     }
-    console.log(list);
 });
 
 function lobbyJoinOnClick(button, pointer){
-    console.log(button.lobby);
+    socket.emit('Join Lobby',button.lobby);
+    game.state.start("InGame");
 }

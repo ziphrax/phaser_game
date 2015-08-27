@@ -20,6 +20,7 @@ io.on('connection', function(socket){
 
   socket.on('diconnect',gs.onDisconnect);
   socket.on('Get Lobby List',gs.onGetLobbyList);
+  socket.on('Join Lobby',gs.onJoinLobby);
 
 });
 
