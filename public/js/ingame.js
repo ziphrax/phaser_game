@@ -39,13 +39,16 @@ ingame.prototype = {
     },
     update: function() {
         var f = filter[FILTER_FILMGRAIN];
-        levelExit = false;
+
+        cursors = game.input.keyboard.createCursorKeys();
 
         game.physics.arcade.collide(player, platforms);
-        cursors = game.input.keyboard.createCursorKeys();
         game.physics.arcade.collide(stars, platforms);
+
+        game.physics.arcade.overlap(player, levelExit, exitLevel, null, this);
         game.physics.arcade.overlap(player, stars, collectStar, null, this);
         game.physics.arcade.overlap(player, spikes, killPlayer, null, this);
+
         updatePlayer();
 
         f.update();
@@ -121,9 +124,9 @@ function createLedges(){
     ledge.body.immovable = true;
 }
 
-function createExit(x,y){
-    console.log('level exit opened');
-    levelExit = game.add.sprite(x, y, 'exit');
+function createExit(){
+    levelExit = game.add.sprite(350  , game.world.height - 150, 'level exit');
+    game.physics.arcade.enable(levelExit);
     levelExit.animations.add('idle', [0, 1, 2, 3], 6, true);
     levelExit.animations.play('idle');
 }
@@ -220,7 +223,6 @@ function updatePlayer(){
 }
 
 function collectStar (player, star) {
-
     // Removes the star from the screen
     star.kill();
 
@@ -233,14 +235,16 @@ function collectStar (player, star) {
 
     if(score == 120){
       scoreText.text = 'Level Complete!';
-      createExit(300,game.world.height - 150);
+      console.log('level exit opened');
+      createExit();
     }
 
 }
 
-function exitLevel(){
+function exitLevel(player , exit){
     console.log('Exiting Level...');
     game.state.start("GameOver");
+    //game.state.start("GameOver");
 }
 
 function killPlayer(player, spike){

@@ -33,7 +33,7 @@ function loadAudio(){
 
 function loadSpritesheets(){
     game.load.spritesheet('dude', '/assets/dude1.png', 32, 48);
-	game.load.spritesheet('exit', '/assets/exit.png', 48, 64);
+	game.load.spritesheet('level exit', '/assets/exit.png', 48, 64);
 }
 
 function loadImages(){
