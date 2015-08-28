@@ -231,7 +231,7 @@ function collectStar (player, star) {
     score += 10;
     scoreText.text = 'Score: ' + score;
 
-    if(score == 10){
+    if(score == 120){
       scoreText.text = 'Level Complete!';
       createExit(300,game.world.height - 150);
     }
