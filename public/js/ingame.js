@@ -16,11 +16,14 @@ var     score = 0
     ,   FILTER_FILMGRAIN = 1
     ,   FILTER_SNOISE = 1
     ,   timer
-    ,   socket;
+    ,   socket
+    , levelExit;
 
 ingame.prototype = {
     create: function() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        main_theme.stop();
 
         createBackground();
         createFilters();
@@ -36,6 +39,7 @@ ingame.prototype = {
     },
     update: function() {
         var f = filter[FILTER_FILMGRAIN];
+        levelExit = false;
 
         game.physics.arcade.collide(player, platforms);
         cursors = game.input.keyboard.createCursorKeys();
@@ -47,30 +51,6 @@ ingame.prototype = {
         f.update();
     }
 
-}
-
-function loadFilters(){
-    game.load.script('filter-vignette', '/assets/filters/Vignette.js');
-    game.load.script('filter-snoise', '/assets/filters/SNoise.js');
-    game.load.script('filter-filmgrain', '/assets/filters/FilmGrain.js');
-}
-
-function loadAudio(){
-    game.load.audio('bg_music','/assets/audio/Electrix_NES.mp3');
-    game.load.audio('jump','/assets/audio/platformer_jumping/jump_05.wav');
-    game.load.audio('step','/assets/audio/steps/stepstone_1.wav');
-    game.load.audio('star','/assets/audio/completetask_0.mp3');
-}
-
-function loadSpritesheets(){
-    game.load.spritesheet('dude', '/assets/dude1.png', 32, 48);
-}
-
-function loadImages(){
-    game.load.image('sky', '/assets/sky.png');
-    game.load.image('ground', '/assets/platform.png');
-    game.load.image('star', '/assets/star.png');
-    game.load.image('spike', '/assets/spike.png');
 }
 
 function createFilters(){
@@ -122,12 +102,12 @@ function createSpikes(){
     spikes.create(256,game.world.height - 64-32,'spike');
     spikes.create(480,game.world.height - 64-32,'spike');
 
-    spikes.create(464,400 -32,'spike');
+    /*spikes.create(464,400 -32,'spike');
     spikes.create(600,400 -32,'spike');
     spikes.create(700,400 -32,'spike');
 
     spikes.create(0,250-32,'spike');
-    spikes.create(128,250-32,'spike');
+    spikes.create(128,250-32,'spike');*/
 }
 
 function createLedges(){
@@ -139,6 +119,13 @@ function createLedges(){
     ledge = platforms.create(-150, 250, 'ground');
 
     ledge.body.immovable = true;
+}
+
+function createExit(x,y){
+    console.log('level exit opened');
+    levelExit = game.add.sprite(x, y, 'exit');
+    levelExit.animations.add('idle', [0, 1, 2, 3], 6, true);
+    levelExit.animations.play('idle');
 }
 
 function createPlayer(){
@@ -230,13 +217,6 @@ function updatePlayer(){
          player.body.velocity.y = -350;
      }
 
-      if(score == 120){
-        scoreText.text = 'Level Complete!';
-      }
-}
-
-function networkUpdate(){
-    //can shove fancy socket.io stuff in here.
 }
 
 function collectStar (player, star) {
@@ -251,9 +231,19 @@ function collectStar (player, star) {
     score += 10;
     scoreText.text = 'Score: ' + score;
 
+    if(score == 10){
+      scoreText.text = 'Level Complete!';
+      createExit(300,game.world.height - 150);
+    }
+
+}
+
+function exitLevel(){
+    console.log('Exiting Level...');
+    game.state.start("GameOver");
 }
 
 function killPlayer(player, spike){
-    player.kill();
-    scoreText.text = 'Game Over!';
+    fx_step.stop();
+    game.state.start("GameOver");
 }

@@ -6,13 +6,14 @@ preload.prototype = {
 		  var loadingProgress = loadingBar.animations.add('loading');
           loadingBar.anchor.setTo(0.5,0.5);
           game.load.setPreloadSprite(loadingBar);
+		  game.load.image("title","/assets/title.png");
 		  loadFilters();
 		  loadAudio();
 		  loadSpritesheets();
 		  loadImages();
 	},
   	create: function(){
-		game.state.start("Lobby");
+		game.state.start("GameTitle");
 	}
 }
 
@@ -24,6 +25,7 @@ function loadFilters(){
 
 function loadAudio(){
     game.load.audio('bg_music','/assets/audio/Electrix_NES.mp3');
+	game.load.audio('main_theme','/assets/audio/main_theme.mp3');
     game.load.audio('jump','/assets/audio/platformer_jumping/jump_05.wav');
     game.load.audio('step','/assets/audio/steps/stepstone_1.wav');
     game.load.audio('star','/assets/audio/completetask_0.mp3');
@@ -31,6 +33,7 @@ function loadAudio(){
 
 function loadSpritesheets(){
     game.load.spritesheet('dude', '/assets/dude1.png', 32, 48);
+	game.load.spritesheet('exit', '/assets/exit.png', 48, 64);
 }
 
 function loadImages(){

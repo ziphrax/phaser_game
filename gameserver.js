@@ -1,7 +1,6 @@
 var gameserver = function(socket){
     var self = this;
-
-
+    
     self.onDisconnect = function(){
         console.log(socket.id + ': has disconnected');
     }
